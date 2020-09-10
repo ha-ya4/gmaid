@@ -16,8 +16,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -29,7 +30,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "gmaid",
 	Short: "automatic code addition, automatic generation",
-	Long: `wanted to make a convenient one that automatically added code and automatically generated code...`,
+	Long:  `wanted to make a convenient one that automatically added code and automatically generated code...`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
