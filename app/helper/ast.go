@@ -3,6 +3,7 @@ package helper
 import (
 	"errors"
 	"go/ast"
+	"go/token"
 )
 
 const (
@@ -42,7 +43,24 @@ func GetStField(node *ast.TypeSpec) ([]StField, error) {
 	var fields []StField
 
 	if sttype, ok := node.Type.(*ast.StructType); ok {
-		for _, field := range sttype.Fields.List {
+		fields, err = GetStFieldStruct(sttype)
+		if err != nil {
+			return fields, err
+		}
+	}
+
+	if len(fields) == 0 {
+		err = errors.New(errNoField)
+	}
+
+	return fields, err
+}
+
+// GetStFieldStruct 引数で受け取ったnodeからフィールドの情報を抜き出した配列で返す
+func GetStFieldStruct(node *ast.StructType) ([]StField, error) {
+	var fields []StField
+
+	for _, field := range node.Fields.List {
 			var typ string
 			if t, ok := field.Type.(*ast.Ident); ok {
 				typ = t.Name
@@ -50,16 +68,42 @@ func GetStField(node *ast.TypeSpec) ([]StField, error) {
 				continue
 			}
 
-			for _, name := range field.Names {
+		if len(field.Names) > 1 {
+			return fields, errors.New("does not support multiple fields")
+		}
+
+		name := field.Names[0]
 				f := StField{Typ: typ}
 				f.Name = name.Name
 				fields = append(fields, f)
 			}
-		}
-	}
 
-	if len(fields) == 0 {
-		err = errors.New(errNoField)
+	return fields, nil
+		}
+
+// AddStTag filedに対してtagを追加する
+// type point struct {
+//  	x, y int
+// }
+// このように複数のfieldが並んでるタイプには未対応
+// たぶんこの２つに対してtagをつけれないと思うから
+func AddStTag(node *ast.StructType, tag string, nameConverter func(str string) string) {
+	for _, f := range node.Fields.List {
+		// すでにタグがあった場合となかった場合で分ける
+		// ない場合は新規で作るだけ
+		if f.Tag == nil {
+			f.Tag = &ast.BasicLit{
+				Kind:  token.STRING,
+				Value: CreateTag(tag, nameConverter(f.Names[0].Name)),
+	}
+			continue
+		}
+
+		// ある場合は元々あるタグと結合する
+		f.Tag.Value = CombineTag(f.Tag.Value, "json", nameConverter(f.Names[0].Name))
+	}
+}
+
 	}
 
 	return fields, err

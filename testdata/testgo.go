@@ -12,13 +12,16 @@ const StName = "Point"
 const TypeAliasName = "danmaku"
 
 // StField structのフィールド情報まとめたもの
-var StField = []string{"xx", "yy", "XxPoint", "YyPoint"}
+var StField = []string{"XxPoint", "YyPoint"}
 
 type danmaku int
 
+type golang struct {
+	x, y int
+}
+
 // Point point
 type Point struct {
-	xx, yy  int
 	XxPoint int
 	YyPoint int
 }
@@ -40,4 +43,13 @@ func add(p1, p2 Point) Point {
 		XxPoint: p1.XxPoint + p2.XxPoint,
 		YyPoint: p1.YyPoint + p2.YyPoint,
 	}
+}
+
+func main() {
+	p := Point{
+		XxPoint: 1,
+		YyPoint: 1,
+	}
+
+	fmt.Println(p)
 }

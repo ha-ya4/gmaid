@@ -75,5 +75,27 @@ func TestGetField(t *testing.T) {
 		return err
 	})
 	assert.EqualError(t, err, errNoField)
-	t.Log(err)
+}
+
+func TestAddStTag(t *testing.T) {
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, "../../testdata/testgo.go", nil, parser.Mode(0))
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+
+	var result []*ast.Field
+	err = TakeOutStruct(f, testdata.StName, func(spec *ast.TypeSpec) error {
+		sttype, ok := spec.Type.(*ast.StructType)
+		if ok {
+			AddStTag(sttype, "json", ToLowerCamel)
+		}
+		result = sttype.Fields.List
+		return nil
+	})
+
+	for _, r := range result {
+		assert.NotEmpty(t, r.Tag)
+	}
 }
