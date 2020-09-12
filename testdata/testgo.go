@@ -53,3 +53,8 @@ func main() {
 
 	fmt.Println(p)
 }
+
+/*
+test comment
+danmaku
+*/

@@ -49,34 +49,6 @@ func TestTakeOutStruct(t *testing.T) {
 	assert.True(t, name == testdata.StName)
 }
 
-func TestGetField(t *testing.T) {
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "../../testdata/testgo.go", nil, parser.Mode(0))
-	if err != nil {
-		t.Log(err)
-		t.FailNow()
-	}
-
-	// structのフィールド情報のスライスを取得できているか
-	fields := []string{}
-	err = TakeOutStruct(f, testdata.StName, func(spec *ast.TypeSpec) error {
-		field, err := GetStField(spec)
-		assert.NoError(t, err)
-		for _, v := range field {
-			fields = append(fields, v.Name)
-		}
-		return err
-	})
-	assert.ElementsMatch(t, testdata.StField, fields)
-
-	// structのフィールド情報のスライスを取得できているか
-	err = TakeOutStruct(f, testdata.TypeAliasName, func(spec *ast.TypeSpec) error {
-		_, err := GetStField(spec)
-		return err
-	})
-	assert.EqualError(t, err, errNoField)
-}
-
 func TestAddStTag(t *testing.T) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, "../../testdata/testgo.go", nil, parser.Mode(0))
